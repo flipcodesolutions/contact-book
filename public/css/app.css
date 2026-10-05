@@ -1,0 +1,331 @@
+:root {
+    --argil-cream: #fdf6ef;
+    --argil-clay: #c4a58d;
+    --argil-clay-dark: #b08f76;
+    --argil-brown: #6b5442;
+    --argil-ink: #1f1f1f;
+    --argil-peach: #fddcc0;
+    --argil-peach-text: #9a4d12;
+    --argil-grey: #efe7df;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: var(--argil-cream);
+    color: var(--argil-ink);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+:focus-visible {
+    outline: 3px solid var(--argil-brown);
+    outline-offset: 2px;
+}
+
+.app-navbar {
+    box-shadow: 0 1px 0 rgba(107, 84, 66, 0.08);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--argil-brown);
+    font-weight: 700;
+}
+
+.navbar-brand:hover {
+    color: var(--argil-ink);
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--argil-brown);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.card {
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(107, 84, 66, 0.08);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--argil-clay);
+    --bs-btn-border-color: var(--argil-clay);
+    --bs-btn-hover-bg: var(--argil-clay-dark);
+    --bs-btn-hover-border-color: var(--argil-clay-dark);
+    --bs-btn-active-bg: var(--argil-clay-dark);
+    --bs-btn-active-border-color: var(--argil-clay-dark);
+    --bs-btn-color: #fff;
+    --bs-btn-hover-color: #fff;
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--argil-brown);
+    --bs-btn-border-color: #d9cfc6;
+    --bs-btn-hover-bg: var(--argil-grey);
+    --bs-btn-hover-color: var(--argil-ink);
+    --bs-btn-hover-border-color: #d9cfc6;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--argil-brown);
+    box-shadow: 0 0 0 0.25rem rgba(107, 84, 66, 0.25);
+}
+
+.badge-department {
+    background: var(--argil-peach);
+    color: var(--argil-peach-text);
+    font-weight: 600;
+}
+
+.badge-neutral {
+    background: var(--argil-grey);
+    color: var(--argil-brown);
+    font-weight: 600;
+}
+
+.lead-card .lead-email,
+.lead-card .lead-address {
+    overflow-wrap: anywhere;
+}
+
+.status-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--argil-brown);
+}
+
+.dept-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    padding: 0.55rem 0.9rem;
+    min-height: 44px;
+    background: var(--argil-grey);
+    color: var(--argil-ink);
+    cursor: pointer;
+    margin: 0 0.5rem 0.5rem 0;
+}
+
+.dept-chip input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.dept-chip:has(input:checked) {
+    background: var(--argil-ink);
+    color: #fff;
+}
+
+.dept-chip:has(input:focus-visible) {
+    outline: 3px solid var(--argil-brown);
+    outline-offset: 2px;
+}
+
+.dept-chip.is-locked {
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.selection-bar {
+    position: sticky;
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    z-index: 1020;
+    background: var(--argil-ink);
+    color: #fff;
+    border-radius: 12px;
+}
+
+.bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    border-top: 1px solid var(--argil-grey);
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 1030;
+}
+
+.bottom-nav a {
+    min-height: 56px;
+    color: var(--argil-brown);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.bottom-nav a.active {
+    color: var(--argil-ink);
+}
+
+.page-subtitle {
+    color: #6b5442;
+}
+
+.lead-checkbox,
+#select-page {
+    width: 1.125rem;
+    height: 1.125rem;
+    min-width: 1.125rem;
+    min-height: 1.125rem;
+    margin-top: 0.2rem;
+}
+
+.lead-copy-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.lead-copy-text {
+    min-width: 0;
+}
+
+.copy-btn {
+    flex: 0 0 auto;
+    border: 1px solid #eadfd4;
+    background: #fff;
+    color: var(--argil-brown);
+    padding: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 1px rgba(31, 31, 31, 0.04);
+}
+
+.copy-btn svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.copy-btn .copied-icon {
+    display: none;
+}
+
+.copy-btn:hover {
+    border-color: var(--argil-clay);
+    color: var(--argil-ink);
+}
+
+.copy-btn.is-copied {
+    color: #2f6f4e;
+    border-color: #b7d4c4;
+    background: #f3faf6;
+}
+
+.copy-btn.is-copied .copy-icon {
+    display: none;
+}
+
+.copy-btn.is-copied .copied-icon {
+    display: block;
+}
+
+.lead-contact-actions {
+    display: flex;
+    gap: 0.45rem;
+}
+
+.lead-contact-actions .icon-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #eadfd4;
+    color: var(--argil-brown);
+    text-decoration: none;
+    box-shadow: 0 1px 1px rgba(31, 31, 31, 0.04);
+}
+
+.lead-contact-actions .icon-btn svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lead-contact-actions .icon-btn:hover {
+    border-color: var(--argil-clay);
+    color: var(--argil-ink);
+}
+
+.card-photo-preview {
+    display: block;
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid #eadfd4;
+    border-radius: 12px;
+}
+
+.card-filled {
+    box-shadow: 0 0 0 2px var(--argil-clay);
+}
+
+@media (max-width: 991.98px) {
+    body {
+        padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
+    }
+
+    .btn,
+    .form-control,
+    .form-select {
+        min-height: 44px;
+    }
+}
+
+@media (min-width: 992px) {
+    body {
+        padding-bottom: 0;
+    }
+
+    .selection-bar {
+        bottom: 1rem;
+    }
+}
