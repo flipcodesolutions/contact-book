@@ -2,7 +2,7 @@
 // It never stores logged-in pages or lead data.
 // Change the cache name when you replace the logo or CSS, so phones pick up the new files.
 
-var STATIC_CACHE = 'argil-static-v6';
+var STATIC_CACHE = 'argil-static-v10';
 
 var PRECACHE_URLS = [
     '/offline.html',
