@@ -4,9 +4,19 @@
         @method('PUT')
     @endif
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="h5">Visiting card</h2>
+    @php
+        $cardSectionOpen = $errors->has('card_front') || $errors->has('card_back');
+    @endphp
+
+    <div class="accordion lead-filter-accordion mb-3" id="visiting-card-section">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="visiting-card-heading">
+                <button class="accordion-button {{ $cardSectionOpen ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#visiting-card-panel" aria-expanded="{{ $cardSectionOpen ? 'true' : 'false' }}" aria-controls="visiting-card-panel">
+                    Visiting card
+                </button>
+            </h2>
+            <div id="visiting-card-panel" class="accordion-collapse collapse {{ $cardSectionOpen ? 'show' : '' }}" aria-labelledby="visiting-card-heading" data-bs-parent="#visiting-card-section">
+                <div class="accordion-body">
             <p class="text-secondary mb-3">Add a clear photo of the front and the back. The reader fills the fields it can see. Check them, choose a department, then save the lead.</p>
 
             <div class="row g-3">
@@ -39,12 +49,19 @@
                 Read card and fill the form
             </button>
             <div id="card-read-status" class="form-text"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="card mb-3">
         <div class="card-body">
-            <h2 class="h5">Contact Particulars</h2>
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                <h2 class="h5 mb-0">Contact Particulars</h2>
+                @if (! $lead->exists)
+                    <button type="submit" class="btn btn-primary lead-save-top d-lg-none">Create Lead</button>
+                @endif
+            </div>
 
             <div class="mb-3">
                 <label class="form-label" for="full_name">Full Name</label>
@@ -116,9 +133,18 @@
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="h5">Dispatch &amp; Territory</h2>
+    @php
+        $territorySectionOpen = $errors->has('address') || $errors->has('city') || $errors->has('country_id');
+    @endphp
+    <div class="accordion lead-filter-accordion mb-3" id="territory-section">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="territory-heading">
+                <button class="accordion-button {{ $territorySectionOpen ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#territory-panel" aria-expanded="{{ $territorySectionOpen ? 'true' : 'false' }}" aria-controls="territory-panel">
+                    Dispatch &amp; Territory
+                </button>
+            </h2>
+            <div id="territory-panel" class="accordion-collapse collapse {{ $territorySectionOpen ? 'show' : '' }}" aria-labelledby="territory-heading" data-bs-parent="#territory-section">
+                <div class="accordion-body">
 
             <div class="mb-3">
                 <label class="form-label" for="address">Physical Address</label>
@@ -151,12 +177,23 @@
                 @enderror
                 <div class="form-text">{{ $territory }}</div>
             </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="h5">Important dates</h2>
+    @php
+        $datesSectionOpen = $errors->has('birthday') || $errors->has('anniversary') || $errors->has('other_date_label') || $errors->has('other_date');
+    @endphp
+    <div class="accordion lead-filter-accordion mb-3" id="dates-section">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="dates-heading">
+                <button class="accordion-button {{ $datesSectionOpen ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#dates-panel" aria-expanded="{{ $datesSectionOpen ? 'true' : 'false' }}" aria-controls="dates-panel">
+                    Important dates
+                </button>
+            </h2>
+            <div id="dates-panel" class="accordion-collapse collapse {{ $datesSectionOpen ? 'show' : '' }}" aria-labelledby="dates-heading" data-bs-parent="#dates-section">
+                <div class="accordion-body">
             <p class="text-secondary">Optional.</p>
 
             <div class="mb-3">
@@ -190,12 +227,23 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <h2 class="h5">Source and notes</h2>
+    @php
+        $notesSectionOpen = $errors->has('lead_source_id') || $errors->has('source_name') || $errors->has('website') || $errors->has('notes');
+    @endphp
+    <div class="accordion lead-filter-accordion mb-3" id="notes-section">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="notes-heading">
+                <button class="accordion-button {{ $notesSectionOpen ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#notes-panel" aria-expanded="{{ $notesSectionOpen ? 'true' : 'false' }}" aria-controls="notes-panel">
+                    Source and notes
+                </button>
+            </h2>
+            <div id="notes-panel" class="accordion-collapse collapse {{ $notesSectionOpen ? 'show' : '' }}" aria-labelledby="notes-heading" data-bs-parent="#notes-section">
+                <div class="accordion-body">
             <p class="text-secondary">Optional. Other saves the new source for next time.</p>
 
             @php $selectedSource = (string) old('lead_source_id', $lead->lead_source_id); @endphp
@@ -235,6 +283,8 @@
                 @error('notes')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+            </div>
+                </div>
             </div>
         </div>
     </div>
@@ -288,7 +338,7 @@
     @endif
 
     <div class="d-flex flex-column flex-sm-row gap-2">
-        <button type="submit" class="btn btn-primary">{{ $lead->exists ? 'Update Lead' : 'Create Lead' }}</button>
+        <button type="submit" class="btn btn-primary {{ $lead->exists ? '' : 'd-none d-lg-inline-block' }}">{{ $lead->exists ? 'Update Lead' : 'Create Lead' }}</button>
         <a class="btn btn-outline-secondary" href="{{ route('leads.index') }}">Cancel</a>
     </div>
 </form>
