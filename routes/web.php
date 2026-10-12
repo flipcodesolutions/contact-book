@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadExportController;
@@ -63,3 +64,15 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::put('/settings/statuses/{status}', [SettingsController::class, 'updateStatus'])->name('statuses.update');
     Route::delete('/settings/statuses/{status}', [SettingsController::class, 'destroyStatus'])->name('statuses.destroy');
 });
+
+// Campaign Creation Pages (matches screenshot mockups)
+Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
+Route::get('/campaign/create', [CampaignController::class, 'create']);
+Route::match(['get', 'post'], '/campaigns/email-content', [CampaignController::class, 'emailContent'])->name('campaigns.email-content');
+Route::match(['get', 'post'], '/campaign/email-content', [CampaignController::class, 'emailContent']);
+Route::match(['get', 'post'], '/campaigns/review', [CampaignController::class, 'review'])->name('campaigns.review');
+Route::match(['get', 'post'], '/campaign/review', [CampaignController::class, 'review']);
+Route::post('/campaigns', [CampaignController::class, 'store'])->name('campaigns.store');
+Route::post('/campaigns/upload', [CampaignController::class, 'upload'])->name('campaigns.upload');
+
+

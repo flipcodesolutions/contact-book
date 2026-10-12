@@ -11,6 +11,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('leads.*') ? 'active' : '' }}" href="{{ route('leads.index') }}" @if (request()->routeIs('leads.*')) aria-current="page" @endif>Leads</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('campaigns.*') ? 'active' : '' }}" href="{{ route('campaigns.create') }}" @if (request()->routeIs('campaigns.*')) aria-current="page" @endif>Campaign</a>
+                </li>
                 @if (auth()->user()->canManageDepartments())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('departments.*') ? 'active' : '' }}" href="{{ route('departments.index') }}" @if (request()->routeIs('departments.*')) aria-current="page" @endif>Departments</a>
