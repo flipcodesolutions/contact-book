@@ -15,74 +15,22 @@
         @endif
     </div>
 
-    <div class="card">
-        <div class="table-responsive">
-            <table class="table mb-0 align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Role</th>
-                        <th scope="col">Departments</th>
-                        <th scope="col">Countries</th>
-                        <th scope="col">Status</th>
-                        @if ($canManage)
-                            <th scope="col">Actions</th>
-                        @endif
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($users as $user)
-                        <tr>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ \App\Models\User::roleOptions()[$user->role] ?? $user->role }}</td>
-                            <td>
-                                @if ($user->isSuperAdmin() || $user->all_departments)
-                                    <span class="text-secondary">All</span>
-                                @else
-                                    @forelse ($user->departments as $department)
-                                        <span class="badge badge-department me-1">{{ $department->name }}</span>
-                                    @empty
-                                        <span class="text-secondary">None</span>
-                                    @endforelse
-                                @endif
-                            </td>
-                            <td>
-                                @if ($user->isSuperAdmin() || $user->all_countries)
-                                    <span class="text-secondary">All</span>
-                                @else
-                                    @forelse ($user->countries as $country)
-                                        <span class="badge badge-neutral me-1">{{ $country->iso2 }}</span>
-                                    @empty
-                                        <span class="text-secondary">None</span>
-                                    @endforelse
-                                @endif
-                            </td>
-                            <td>{{ $user->is_active ? 'Active' : 'Inactive' }}</td>
-                            @if ($canManage)
-                                <td>
-                                    @if (auth()->user()->isSuperAdmin() || ! $user->isSuperAdmin())
-                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('users.edit', $user) }}">Edit</a>
-                                        <form method="POST" action="{{ route('users.toggle', $user) }}" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                {{ $user->is_active ? 'Deactivate' : 'Activate' }}
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
-                            @endif
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7">No users yet.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    @if ($users->count() === 0)
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h2 class="h5">No users found</h2>
+                <p class="text-secondary mb-0">Create a user to get started.</p>
+            </div>
         </div>
-    </div>
+    @else
+        <div class="row g-3">
+            @foreach ($users as $user)
+                <div class="col-12 col-md-6 col-lg-4">
+                    @include('partials.user-card', ['user' => $user, 'canManage' => $canManage])
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     @include('partials.pagination', ['paginator' => $users])
 @endsection

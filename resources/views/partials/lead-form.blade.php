@@ -59,7 +59,7 @@
             <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                 <h2 class="h5 mb-0">Contact Particulars</h2>
                 @if (! $lead->exists)
-                    <button type="submit" class="btn btn-primary lead-save-top d-lg-none">Create Lead</button>
+                    <button type="submit" class="btn btn-primary lead-save-top d-lg-none">Save Contact</button>
                 @endif
             </div>
 
@@ -294,6 +294,13 @@
             <h2 class="h5">Department Routing</h2>
             <p class="text-secondary">Optional.</p>
 
+            @if ($availableDepartments->isNotEmpty())
+                <label class="dept-chip">
+                    <input type="checkbox" id="dept-select-all">
+                    <span>All</span>
+                </label>
+            @endif
+
             @foreach ($availableDepartments as $department)
                 <label class="dept-chip">
                     <input type="checkbox" name="department_ids[]" value="{{ $department->id }}" @if (in_array($department->id, $selectedDepartmentIds)) checked @endif>
@@ -337,9 +344,9 @@
         </div>
     @endif
 
-    <div class="d-flex flex-column flex-sm-row gap-2">
-        <button type="submit" class="btn btn-primary {{ $lead->exists ? '' : 'd-none d-lg-inline-block' }}">{{ $lead->exists ? 'Update Lead' : 'Create Lead' }}</button>
-        <a class="btn btn-outline-secondary" href="{{ route('leads.index') }}">Cancel</a>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary flex-fill" href="{{ route('leads.index') }}">Cancel</a>
+        <button type="submit" class="btn btn-primary flex-fill">Save</button>
     </div>
 </form>
 
@@ -354,6 +361,32 @@
             } else {
                 otherSourceWrap.classList.add('d-none');
             }
+        });
+    }
+
+    // Select/Unselect All Departments
+    var selectAllDept = document.getElementById('dept-select-all');
+    var deptCheckboxes = document.querySelectorAll('input[name="department_ids[]"]:not(:disabled)');
+
+    if (selectAllDept && deptCheckboxes.length > 0) {
+        function syncSelectAllState() {
+            var allChecked = Array.from(deptCheckboxes).every(function (cb) {
+                return cb.checked;
+            });
+            selectAllDept.checked = allChecked;
+        }
+
+        syncSelectAllState();
+
+        selectAllDept.addEventListener('change', function () {
+            var isChecked = selectAllDept.checked;
+            deptCheckboxes.forEach(function (cb) {
+                cb.checked = isChecked;
+            });
+        });
+
+        deptCheckboxes.forEach(function (cb) {
+            cb.addEventListener('change', syncSelectAllState);
         });
     }
 </script>

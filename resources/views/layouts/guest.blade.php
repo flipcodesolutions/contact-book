@@ -20,6 +20,7 @@
             </div>
         </div>
     </main>
-    <script src="{{ asset('js/argil.js') }}"></script>
+    <script src="{{ asset('js/argil.js') }}?v={{ time() }}"></script>
+    @yield('scripts')
 </body>
 </html>

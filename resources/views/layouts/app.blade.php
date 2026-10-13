@@ -12,7 +12,7 @@
     </main>
 
     @include('partials.bottom-nav')
-    <script src="{{ asset('js/argil.js') }}"></script>
+    <script src="{{ asset('js/argil.js') }}?v={{ time() }}"></script>
     <script>
         // The service worker only runs in a secure browser.
         // https:// is required in production. http://localhost is allowed for local testing.

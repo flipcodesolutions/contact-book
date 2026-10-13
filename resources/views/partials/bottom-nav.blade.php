@@ -5,10 +5,12 @@
                 <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
                 Leads
             </a>
+            {{-- Temporarily hidden: Campaign
             <a class="flex-fill d-flex flex-column align-items-center justify-content-center {{ request()->routeIs('campaigns.*') ? 'active' : '' }}" href="{{ route('campaigns.create') }}" @if (request()->routeIs('campaigns.*')) aria-current="page" @endif>
                 <i class="bi bi-megaphone" aria-hidden="true"></i>
                 Campaign
             </a>
+            --}}
             @if (auth()->user()->canManageDepartments())
                 <a class="flex-fill d-flex flex-column align-items-center justify-content-center {{ request()->routeIs('departments.*') ? 'active' : '' }}" href="{{ route('departments.index') }}" @if (request()->routeIs('departments.*')) aria-current="page" @endif>
                     <i class="bi bi-diagram-3" aria-hidden="true"></i>

@@ -29,10 +29,42 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label" for="old_password">Old password</label>
+                    <div class="input-group">
+                        <input class="form-control @error('old_password') is-invalid @enderror" id="old_password" name="old_password" type="password" autocomplete="current-password">
+                        <button class="btn btn-outline-secondary js-toggle-password" type="button" aria-label="Show password" onclick="togglePasswordVisibility(this); event.stopPropagation();">
+                            <svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="eye-slash-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; pointer-events: none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    @error('old_password')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label" for="password">New password</label>
-                    <input class="form-control @error('password') is-invalid @enderror" id="password" name="password" type="password" minlength="8" autocomplete="new-password">
+                    <div class="input-group">
+                        <input class="form-control @error('password') is-invalid @enderror" id="password" name="password" type="password" minlength="8" autocomplete="new-password">
+                        <button class="btn btn-outline-secondary js-toggle-password" type="button" aria-label="Show password" onclick="togglePasswordVisibility(this); event.stopPropagation();">
+                            <svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="eye-slash-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none; pointer-events: none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
                     @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                     <div class="form-text">Leave blank to keep your current password. New passwords need letters and numbers.</div>
                 </div>
@@ -52,73 +84,28 @@
         </div>
     </div>
 
-    @if (auth()->user()->canManageStatuses())
-        <div class="card">
-            <div class="card-body">
-                <h2 class="h5">Lead statuses</h2>
+@endsection
 
-                <form method="POST" action="{{ $editingStatus ? route('statuses.update', $editingStatus) : route('statuses.store') }}" class="row g-2 align-items-end mb-4 js-single-submit">
-                    @csrf
-                    @if ($editingStatus)
-                        @method('PUT')
-                    @endif
-                    <div class="col-12 col-md-5">
-                        <label class="form-label" for="status_name">Name</label>
-                        <input class="form-control @error('name') is-invalid @enderror" id="status_name" name="name" value="{{ old('name', $editingStatus ? $editingStatus->name : '') }}" required maxlength="100">
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <label class="form-label" for="color">Colour</label>
-                        <input class="form-control @error('color') is-invalid @enderror" id="color" name="color" type="color" value="{{ old('color', $editingStatus ? $editingStatus->color : '#6B5442') }}" required>
-                        @error('color')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <button type="submit" class="btn btn-primary">{{ $editingStatus ? 'Update status' : 'Add status' }}</button>
-                        @if ($editingStatus)
-                            <a class="btn btn-outline-secondary" href="{{ route('settings.edit') }}">Cancel</a>
-                        @endif
-                    </div>
-                </form>
+@section('scripts')
+<script>
+window.togglePasswordVisibility = function (button) {
+    if (!button) return;
+    var group = button.closest ? button.closest('.input-group') : button.parentElement;
+    var input = group ? group.querySelector('input') : null;
+    if (!input) return;
 
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col">Status</th>
-                                <th scope="col">Colour</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($statuses as $status)
-                                <tr>
-                                    <td>
-                                        <span class="status-dot me-2" style="background: {{ $status->color }}"></span>
-                                        {{ $status->name }}
-                                    </td>
-                                    <td>{{ $status->color }}</td>
-                                    <td>
-                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('settings.edit', ['edit_status' => $status->id]) }}">Edit</a>
-                                        <form method="POST" action="{{ route('statuses.destroy', $status) }}" class="d-inline" onsubmit="return confirm('Delete this status? Leads that use it will have no status.');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3">No statuses yet.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    @endif
+    var eye = button.querySelector('.eye-icon');
+    var eyeSlash = button.querySelector('.eye-slash-icon');
+
+    var isPassword = input.type === 'password' || input.getAttribute('type') === 'password';
+    var nextType = isPassword ? 'text' : 'password';
+
+    input.type = nextType;
+    input.setAttribute('type', nextType);
+
+    if (eye) eye.style.display = isPassword ? 'none' : 'block';
+    if (eyeSlash) eye.style.display = isPassword ? 'block' : 'none';
+    button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+};
+</script>
 @endsection

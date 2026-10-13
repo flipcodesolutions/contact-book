@@ -121,3 +121,53 @@ if (iosHint && isIos && !isStandalone) {
         installNote.hidden = true;
     }
 }
+
+// Toggle password visibility helper
+window.togglePasswordVisibility = function (button) {
+    if (!button) {
+        return;
+    }
+
+    var group = button.closest ? button.closest('.input-group') : button.parentElement;
+    if (!group) {
+        return;
+    }
+
+    var input = group.querySelector('input[name="password"], input[type="password"], input[type="text"]');
+    if (!input) {
+        return;
+    }
+
+    var isPassword = input.getAttribute('type') === 'password' || input.type === 'password';
+    var nextType = isPassword ? 'text' : 'password';
+
+    input.type = nextType;
+    input.setAttribute('type', nextType);
+
+    var eye = button.querySelector('.eye-icon') || button.querySelector('#eye-icon');
+    var eyeSlash = button.querySelector('.eye-slash-icon') || button.querySelector('#eye-slash-icon');
+
+    if (eye) {
+        eye.style.display = isPassword ? 'none' : 'block';
+    }
+    if (eyeSlash) {
+        eyeSlash.style.display = isPassword ? 'block' : 'none';
+    }
+
+    button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+};
+
+// Delegated listener for password toggles (ignores buttons with inline onclick to prevent double toggling)
+document.addEventListener('click', function (event) {
+    var button = event.target.closest ? event.target.closest('.js-toggle-password') : null;
+
+    if (!button) {
+        return;
+    }
+
+    if (button.hasAttribute('onclick')) {
+        return;
+    }
+
+    window.togglePasswordVisibility(button);
+});
