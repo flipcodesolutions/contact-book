@@ -32,11 +32,12 @@
                                 @endif
                             </td>
                             <td>
-                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('departments.edit', $department) }}">Edit</a>
-                                <form method="POST" action="{{ route('departments.toggle', $department) }}" class="d-inline">
+                                <a class="btn btn-outline-secondary btn-sm" href="{{ route('departments.edit', $department) }}" title="Edit" aria-label="Edit {{ $department->name }}"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                                <form method="POST" action="{{ route('departments.destroy', $department) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete department &quot;{{ $department->name }}&quot;?');">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                        {{ $department->is_active ? 'Deactivate' : 'Activate' }}
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete" aria-label="Delete {{ $department->name }}">
+                                        Delete
                                     </button>
                                 </form>
                             </td>

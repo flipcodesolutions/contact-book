@@ -26,7 +26,7 @@ class DepartmentRequest extends FormRequest
         $departmentId = $department instanceof Department ? $department->id : null;
 
         return [
-            'name' => ['required', 'string', 'max:100', Rule::unique('departments', 'name')->ignore($departmentId)],
+            'name' => ['required', 'string', 'max:100', Rule::unique('departments', 'name')->ignore($departmentId)->whereNull('deleted_at')],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

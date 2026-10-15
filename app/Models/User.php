@@ -143,21 +143,26 @@ class User extends Authenticatable
         return $this->canManageUsers();
     }
 
-    /**
-     * True when this person can see every lead.
-     * All departments covers every country. All countries covers every department.
-     */
-    public function seesAllLeads(): bool
+    public function isAdmin(): bool
     {
-        return $this->isSuperAdmin() || $this->all_departments || $this->all_countries;
+        return in_array($this->role, ['super_admin', 'admin']);
     }
 
     /**
-     * A department right covers those departments in every country.
+     * True when this person can see every lead.
+     * Super admins and admins see everything. Other users see everything if both all_departments and all_countries are set.
+     */
+    public function seesAllLeads(): bool
+    {
+        return $this->isAdmin() || ($this->all_departments && $this->all_countries);
+    }
+
+    /**
+     * True when this person owns every one of the given department ids.
      */
     public function ownsEveryDepartment(array $departmentIds): bool
     {
-        if ($this->isSuperAdmin() || $this->all_departments) {
+        if ($this->seesAllLeads() || $this->all_departments) {
             return true;
         }
 
@@ -186,11 +191,11 @@ class User extends Authenticatable
     }
 
     /**
-     * A country right covers every department in that country.
+     * True when this person owns the given country id.
      */
     public function ownsCountry($countryId): bool
     {
-        if ($this->isSuperAdmin() || $this->all_countries) {
+        if ($this->seesAllLeads() || $this->all_countries) {
             return true;
         }
 
@@ -206,24 +211,26 @@ class User extends Authenticatable
     }
 
     /**
-     * The save is allowed when the departments are theirs (any country)
-     * or the country is theirs (any department).
+     * The save is allowed when both country and departments match the user's access.
      */
     public function canUseLeadAccess($countryId, array $departmentIds): bool
     {
-        if ($this->ownsEveryDepartment($departmentIds)) {
+        if ($this->seesAllLeads()) {
             return true;
         }
 
-        return $this->ownsCountry($countryId);
+        $countryAllowed = $this->all_countries || ($countryId && $this->ownsCountry($countryId));
+        $departmentAllowed = $this->all_departments || (count($departmentIds) > 0 && $this->ownsEveryDepartment($departmentIds));
+
+        return $countryAllowed && $departmentAllowed;
     }
 
     /**
-     * Country ids this user may save on a lead. Super admins are not limited.
+     * Country ids this user may save on a lead.
      */
     public function allowedCountryIds(): array
     {
-        if ($this->isSuperAdmin()) {
+        if ($this->seesAllLeads() || $this->all_countries) {
             return Country::query()->where('is_active', true)->pluck('id')->all();
         }
 
@@ -231,11 +238,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Department ids this user may save on a lead. Super admins are not limited.
+     * Department ids this user may save on a lead.
      */
     public function allowedDepartmentIds(): array
     {
-        if ($this->isSuperAdmin()) {
+        if ($this->seesAllLeads() || $this->all_departments) {
             return Department::query()->where('is_active', true)->pluck('id')->all();
         }
 

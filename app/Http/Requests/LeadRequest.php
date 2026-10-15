@@ -94,7 +94,7 @@ class LeadRequest extends FormRequest
                     return;
                 }
 
-                $fail('This department and country combination is outside your access. Use one of your departments, or one of your countries.');
+                $fail('This department and country combination is outside your access. Both country and department must match your access.');
             }],
             'department_ids' => ['nullable', 'array'],
             'department_ids.*' => ['integer', 'exists:departments,id'],

@@ -110,9 +110,8 @@ class Lead extends Model
 
     /**
      * Limit the query to leads this user is allowed to see.
-     * A department right includes that department in every country.
-     * A country right includes every department in that country.
-     * All departments, or all countries, shows every lead.
+     * Admin and super admin see all leads.
+     * Other users only see leads matching their assigned country AND department.
      */
     public function scopeVisibleTo($query, User $user)
     {
@@ -120,24 +119,32 @@ class Lead extends Model
             return $query;
         }
 
-        $departmentIds = $user->departments()->pluck('departments.id')->all();
+        $hasAllCountries = (bool) $user->all_countries;
+        $hasAllDepartments = (bool) $user->all_departments;
         $countryIds = $user->countries()->pluck('countries.id')->all();
+        $departmentIds = $user->departments()->pluck('departments.id')->all();
 
-        if (count($departmentIds) === 0 && count($countryIds) === 0) {
+        if (! $hasAllCountries && count($countryIds) === 0 && ! $hasAllDepartments && count($departmentIds) === 0) {
             return $query->where('created_by', $user->id);
         }
 
-        return $query->where(function ($innerQuery) use ($departmentIds, $countryIds, $user) {
-            $innerQuery->where('created_by', $user->id);
-
-            if (count($departmentIds) > 0) {
-                $innerQuery->orWhereHas('departments', function ($departmentQuery) use ($departmentIds) {
-                    $departmentQuery->whereIn('departments.id', $departmentIds);
-                });
+        return $query->where(function ($leadQuery) use ($countryIds, $departmentIds, $hasAllCountries, $hasAllDepartments) {
+            if (! $hasAllCountries) {
+                if (count($countryIds) === 0) {
+                    $leadQuery->whereRaw('0 = 1');
+                } else {
+                    $leadQuery->whereIn('country_id', $countryIds);
+                }
             }
 
-            if (count($countryIds) > 0) {
-                $innerQuery->orWhereIn('country_id', $countryIds);
+            if (! $hasAllDepartments) {
+                if (count($departmentIds) === 0) {
+                    $leadQuery->whereRaw('0 = 1');
+                } else {
+                    $leadQuery->whereHas('departments', function ($departmentQuery) use ($departmentIds) {
+                        $departmentQuery->whereIn('departments.id', $departmentIds);
+                    });
+                }
             }
         });
     }
@@ -178,6 +185,14 @@ class Lead extends Model
 
         if ($request->filled('lead_status_id')) {
             $query->where('lead_status_id', $request->input('lead_status_id'));
+        }
+
+        if ($request->filled('lead_source_id')) {
+            if ($request->input('lead_source_id') === 'none') {
+                $query->whereNull('lead_source_id');
+            } else {
+                $query->where('lead_source_id', $request->input('lead_source_id'));
+            }
         }
 
         return $query;

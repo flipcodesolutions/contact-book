@@ -501,3 +501,25 @@ body {
     justify-content: center;
     flex-shrink: 0;
 }
+
+/* Searchable Dial Code Dropdown */
+#dial-code-dropdown {
+    box-shadow: 0 10px 25px rgba(107, 84, 66, 0.15) !important;
+    border-color: #e5ded7 !important;
+}
+
+.dial-code-opt {
+    transition: background-color 0.12s ease-in-out, color 0.12s ease-in-out;
+}
+
+.dial-code-opt:hover,
+.dial-code-opt:focus {
+    background-color: var(--argil-cream, #fdf6ef);
+    color: var(--argil-brown, #6b5442);
+}
+
+#dial-code-search-input:focus {
+    border-color: var(--argil-brown, #6b5442);
+    box-shadow: 0 0 0 0.2rem rgba(107, 84, 66, 0.2);
+}
+

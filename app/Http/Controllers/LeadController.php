@@ -33,8 +33,9 @@ class LeadController extends Controller
         $countries = $this->countriesFor($user);
         $departments = $this->departmentsFor($user);
         $statuses = LeadStatus::query()->orderBy('name')->get();
+        $sources = LeadSource::query()->orderBy('name')->get();
 
-        return view('leads.index', compact('leads', 'countries', 'departments', 'statuses'));
+        return view('leads.index', compact('leads', 'countries', 'departments', 'statuses', 'sources'));
     }
 
     /**
@@ -230,10 +231,7 @@ class LeadController extends Controller
      */
     private function leadFormData(User $user, Lead $lead): array
     {
-        $hasDepartmentRight = $user->seesAllLeads() || $user->departments()->count() > 0;
-        $hasCountryRight = $user->seesAllLeads() || $user->countries()->count() > 0;
-
-        if ($hasDepartmentRight) {
+        if ($user->seesAllLeads() || $user->all_countries) {
             $countries = Country::query()->where('is_active', true)->orderBy('name')->get();
         } else {
             $allowedCountryIds = $user->allowedCountryIds();
@@ -250,7 +248,7 @@ class LeadController extends Controller
 
         $departments = Department::query()->where('is_active', true)->orderBy('name')->get();
 
-        if ($hasCountryRight) {
+        if ($user->seesAllLeads() || $user->all_departments) {
             $availableDepartments = $departments->values();
             $lockedDepartments = collect();
         } else {
@@ -274,7 +272,7 @@ class LeadController extends Controller
         if ($user->seesAllLeads()) {
             $territory = 'All countries and all departments';
         } else {
-            $territory = 'A department right includes that department in every country. A country right includes every department in that country.';
+            $territory = 'Only leads matching your assigned countries and departments.';
         }
 
         $dialCodes = Country::query()->where('is_active', true)->orderBy('name')->get();
@@ -296,13 +294,14 @@ class LeadController extends Controller
 
     private function countriesFor(User $user)
     {
-        if ($user->seesAllLeads() || $user->departments()->count() > 0) {
+        if ($user->seesAllLeads() || $user->all_countries) {
             return Country::query()->where('is_active', true)->orderBy('name')->get();
         }
 
         $countryIds = $user->countries()->pluck('countries.id')->all();
 
         return Country::query()
+            ->where('is_active', true)
             ->whereIn('id', $countryIds === [] ? [0] : $countryIds)
             ->orderBy('name')
             ->get();
@@ -310,13 +309,14 @@ class LeadController extends Controller
 
     private function departmentsFor(User $user)
     {
-        if ($user->seesAllLeads() || $user->countries()->count() > 0) {
+        if ($user->seesAllLeads() || $user->all_departments) {
             return Department::query()->where('is_active', true)->orderBy('name')->get();
         }
 
         $departmentIds = $user->departments()->pluck('departments.id')->all();
 
         return Department::query()
+            ->where('is_active', true)
             ->whereIn('id', $departmentIds === [] ? [0] : $departmentIds)
             ->orderBy('name')
             ->get();
