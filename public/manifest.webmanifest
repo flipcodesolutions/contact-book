@@ -1,6 +1,6 @@
 {
-    "name": "Argil Leads",
-    "short_name": "Argil",
+    "name": "Contact Book",
+    "short_name": "Contact Book",
     "start_url": "/leads",
     "scope": "/",
     "display": "standalone",

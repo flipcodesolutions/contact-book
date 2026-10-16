@@ -1,9 +1,8 @@
 <nav class="navbar navbar-expand bg-white app-navbar">
     <div class="container">
         <a class="navbar-brand" href="{{ auth()->check() ? route('leads.index') : route('login') }}">
-            {{-- Replace public/images/argil-logo.svg with the real Argil logo. --}}
-            <img src="{{ asset('images/argil-logo.svg') }}" alt="" width="36" height="36">
-            Argil Leads
+            <img src="{{ asset('images/argil-logo.png') }}" alt="Contact Book" width="36" height="36">
+            Contact Book
         </a>
 
         @auth

@@ -28,9 +28,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [PasswordResetController::class, 'update'])->name('password.update');
 });
 
-Route::middleware(['auth', 'active'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+Route::match(['get', 'post'], '/logout', [LoginController::class, 'destroy'])->name('logout');
 
+Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
     Route::get('/leads/create', [LeadController::class, 'create'])->name('leads.create');
     Route::post('/leads/visiting-card', [LeadController::class, 'readCard'])->name('leads.visiting-card');
