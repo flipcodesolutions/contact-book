@@ -16,9 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'active' => EnsureUserIsActive::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'logout',
+        ]);
+
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo('/leads');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
+            return redirect()->route('login');
+        });
     })->create();

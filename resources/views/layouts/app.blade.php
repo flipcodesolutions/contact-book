@@ -18,7 +18,7 @@
         // https:// is required in production. http://localhost is allowed for local testing.
         if ('serviceWorker' in navigator && window.isSecureContext) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('/service-worker.js');
+                navigator.serviceWorker.register('/service-worker.js?v={{ time() }}');
             });
         }
     </script>

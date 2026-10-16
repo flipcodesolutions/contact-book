@@ -77,7 +77,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="h5">Install App</h2>
-            <p class="text-secondary">Install Argil Leads on your phone. This works over HTTPS.</p>
+            <p class="text-secondary">Install Contact Book on your phone. This works over HTTPS.</p>
             <button type="button" class="btn btn-primary" id="install-app-button" hidden>Install App</button>
             <p id="ios-install-hint" class="mb-0" hidden>On iPhone or iPad, tap the Share button, then choose Add to Home Screen.</p>
             <p id="install-app-note" class="text-secondary mb-0">If the button stays hidden, open this site in Chrome or Edge over HTTPS, or use your browser's install menu.</p>

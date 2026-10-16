@@ -2,13 +2,15 @@
 // It never stores logged-in pages or lead data.
 // Change the cache name when you replace the logo or CSS, so phones pick up the new files.
 
-var STATIC_CACHE = 'argil-static-v10';
+var STATIC_CACHE = 'argil-static-v13';
 
 var PRECACHE_URLS = [
     '/offline.html',
     '/css/app.css',
     '/js/argil.js',
-    '/images/argil-logo.svg',
+    '/favicon-32x32.png',
+    '/favicon-16x16.png',
+    '/apple-touch-icon.png',
     '/icons/icon-192.png',
     '/icons/icon-512.png',
     '/icons/icon-maskable-192.png',
