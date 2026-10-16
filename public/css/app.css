@@ -608,27 +608,6 @@ input:-webkit-autofill:active {
     flex-shrink: 0;
 }
 
-/* Searchable Dial Code Dropdown */
-#dial-code-dropdown {
-    box-shadow: 0 10px 25px rgba(107, 84, 66, 0.15) !important;
-    border-color: #e5ded7 !important;
-}
-
-.dial-code-opt {
-    transition: background-color 0.12s ease-in-out, color 0.12s ease-in-out;
-}
-
-.dial-code-opt:hover,
-.dial-code-opt:focus {
-    background-color: var(--argil-cream, #fdf6ef);
-    color: var(--argil-brown, #6b5442);
-}
-
-#dial-code-search-input:focus {
-    border-color: var(--argil-brown, #6b5442);
-    box-shadow: 0 0 0 0.2rem rgba(107, 84, 66, 0.2);
-}
-
 .pagination {
     --bs-pagination-color: var(--argil-brown);
     --bs-pagination-hover-color: var(--argil-ink);
@@ -652,4 +631,53 @@ input:-webkit-autofill:active {
     background-color: var(--argil-brown) !important;
     border-color: var(--argil-brown) !important;
     color: #fff !important;
+}
+
+/* Custom Searchable Dial Code Component */
+#custom-dial-code-trigger:focus,
+#custom-dial-code-trigger.open-focus {
+    border-color: var(--argil-brown, #6b5442) !important;
+    box-shadow: 0 0 0 0.25rem rgba(107, 84, 66, 0.25) !important;
+    outline: none !important;
+}
+
+#custom-dial-code-search:focus {
+    border-color: var(--argil-brown, #6b5442) !important;
+    box-shadow: 0 0 0 0.2rem rgba(107, 84, 66, 0.2) !important;
+    outline: none !important;
+}
+
+.custom-dial-opt {
+    color: var(--argil-ink, #1f1f1f);
+    transition: background-color 0.12s ease-in-out, color 0.12s ease-in-out;
+}
+
+.custom-dial-opt .dial-code-prefix {
+    color: var(--argil-brown, #6b5442);
+}
+
+.custom-dial-opt:hover,
+.custom-dial-opt.hover-focus {
+    background-color: var(--argil-cream, #fdf6ef) !important;
+    color: var(--argil-brown, #6b5442) !important;
+}
+
+.custom-dial-opt.active-opt {
+    background-color: var(--argil-brown, #6b5442) !important;
+    color: #ffffff !important;
+}
+
+.custom-dial-opt.active-opt .dial-code-prefix {
+    color: #ffffff !important;
+}
+
+/* Remove default blue from Select2 results */
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: var(--argil-brown, #6b5442) !important;
+    color: #ffffff !important;
+}
+
+.select2-container--default .select2-results__option--selected {
+    background-color: var(--argil-grey, #efe7df) !important;
+    color: var(--argil-brown, #6b5442) !important;
 }

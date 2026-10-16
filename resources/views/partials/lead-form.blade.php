@@ -76,43 +76,75 @@
                 <div class="row g-2">
                     <div class="col-12 col-sm-5">
                         <label class="visually-hidden" for="phone_country_code">Dial code</label>
-                        <div class="position-relative" id="dial-code-picker">
-                            <select class="form-select @error('phone_country_code') is-invalid @enderror" id="phone_country_code" name="phone_country_code" required style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; top: 0; left: 0; z-index: -1;">
-                                <option value="">Dial code</option>
-                                @php $dialCodeSelected = false; @endphp
-                                @foreach ($dialCodes as $dialCode)
-                                    <option value="{{ $dialCode->dial_code }}" @if (! $dialCodeSelected && old('phone_country_code', $lead->phone_country_code) === $dialCode->dial_code) selected @php $dialCodeSelected = true; @endphp @endif>
-                                        {{ $dialCode->dial_code }} {{ $dialCode->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        {{-- Hidden real select for form submit and validation --}}
+                        <select class="d-none" id="phone_country_code" name="phone_country_code" required>
+                            <option value="">Dial code</option>
+                            @php $dialCodeSelected = false; @endphp
+                            @foreach ($dialCodes as $dialCode)
+                                <option value="{{ $dialCode->dial_code }}" @if (! $dialCodeSelected && old('phone_country_code', $lead->phone_country_code) === $dialCode->dial_code) selected @php $dialCodeSelected = true; @endphp @endif>
+                                    {{ $dialCode->dial_code }} {{ $dialCode->name }}
+                                </option>
+                            @endforeach
+                        </select>
 
-                            <button type="button" class="form-select text-start @error('phone_country_code') is-invalid @enderror" id="dial-code-btn" aria-haspopup="true" aria-expanded="false" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                                <span id="dial-code-label" class="{{ old('phone_country_code', $lead->phone_country_code) ? '' : 'text-secondary' }}">
-                                    @php
-                                        $currentCode = old('phone_country_code', $lead->phone_country_code);
-                                        $matchingCountry = $dialCodes->firstWhere('dial_code', $currentCode);
-                                    @endphp
-                                    {{ $matchingCountry ? $matchingCountry->dial_code . ' ' . $matchingCountry->name : ($currentCode ?: 'Dial code') }}
+                        {{-- Custom Searchable Dial Code Component --}}
+                        <div class="position-relative" id="custom-dial-code-wrapper">
+                            @php
+                                $selectedCode = old('phone_country_code', $lead->phone_country_code);
+                                $matchedCountry = $dialCodes->firstWhere('dial_code', $selectedCode);
+                                $displayLabel = $matchedCountry ? ($matchedCountry->dial_code . ' ' . $matchedCountry->name) : ($selectedCode ?: 'Dial code');
+                            @endphp
+                            <button type="button" 
+                                    class="form-select text-start d-flex align-items-center justify-content-between @error('phone_country_code') is-invalid @enderror" 
+                                    id="custom-dial-code-trigger" 
+                                    aria-haspopup="listbox" 
+                                    aria-expanded="false"
+                                    style="min-height: 38px; cursor: pointer; background-image: none !important;">
+                                <span id="custom-dial-code-text" class="text-truncate {{ $selectedCode ? '' : 'text-secondary' }}" style="max-width: calc(100% - 20px);">
+                                    {{ $displayLabel }}
                                 </span>
+                                <i class="bi bi-chevron-down ms-1" style="font-size: 0.75rem; color: var(--argil-brown, #6b5442); pointer-events: none;"></i>
                             </button>
 
-                            <div class="dropdown-menu p-2 shadow border w-100" id="dial-code-dropdown" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1050; min-width: 270px; border-radius: 8px;">
-                                <div class="mb-2">
-                                    <input type="text" class="form-control form-control-sm" id="dial-code-search-input" placeholder="Search country or code..." autocomplete="off">
+                            <div class="dropdown-menu p-2 shadow border w-100" 
+                                 id="custom-dial-code-dropdown" 
+                                 style="display: none; position: absolute; top: 100%; left: 0; z-index: 1060; min-width: 280px; border-radius: 8px; border-color: #eadfd4; background: #fff;">
+                                <div class="p-1 mb-2">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white border-end-0" style="color: var(--argil-brown, #6b5442); border-color: #dee2e6;">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control border-start-0" 
+                                               id="custom-dial-code-search" 
+                                               placeholder="Search country or code..." 
+                                               autocomplete="off"
+                                               style="border-color: #dee2e6;">
+                                    </div>
                                 </div>
-                                <div class="dial-code-options-list" style="max-height: 220px; overflow-y: auto;">
-                                    <div class="dropdown-item py-1 px-2 rounded dial-code-opt text-secondary" data-value="" data-label="Dial code" data-search="dial code" style="cursor: pointer;">
-                                        <em>Dial code</em>
+                                <div id="custom-dial-code-list" style="max-height: 240px; overflow-y: auto;">
+                                    <div class="dropdown-item py-1 px-2 rounded custom-dial-opt text-secondary" 
+                                         data-value="" 
+                                         data-label="Dial code" 
+                                         data-search="dial code" 
+                                         style="cursor: pointer;">
+                                        <em>Dial code (None)</em>
                                     </div>
                                     @foreach ($dialCodes as $dialCode)
-                                        <div class="dropdown-item py-1 px-2 rounded dial-code-opt" data-value="{{ $dialCode->dial_code }}" data-label="{{ $dialCode->dial_code }} {{ $dialCode->name }}" data-search="{{ strtolower($dialCode->dial_code . ' ' . $dialCode->name) }}" style="cursor: pointer; font-size: 0.875rem;">
-                                            <strong style="color: var(--argil-brown, #6b5442);">{{ $dialCode->dial_code }}</strong> {{ $dialCode->name }}
+                                        @php
+                                            $isItemActive = ($selectedCode === $dialCode->dial_code);
+                                        @endphp
+                                        <div class="dropdown-item py-1 px-2 rounded custom-dial-opt {{ $isItemActive ? 'active-opt' : '' }}" 
+                                             data-value="{{ $dialCode->dial_code }}" 
+                                             data-label="{{ $dialCode->dial_code }} {{ $dialCode->name }}" 
+                                             data-search="{{ strtolower($dialCode->dial_code . ' ' . $dialCode->name) }}" 
+                                             style="cursor: pointer; font-size: 0.875rem;">
+                                            <strong class="dial-code-prefix">{{ $dialCode->dial_code }}</strong> {{ $dialCode->name }}
                                         </div>
                                     @endforeach
                                 </div>
-                                <div id="dial-code-empty" class="text-secondary text-center py-2 small d-none">
-                                    No matching dial code
+                                <div id="custom-dial-code-empty" class="text-secondary text-center py-2 small d-none">
+                                    No matching dial code found
                                 </div>
                             </div>
                         </div>
@@ -402,79 +434,66 @@
         });
     }
 
-    // Searchable Dial Code Dropdown
+    // Custom Searchable Dial Code Component Logic
     (function () {
-        var picker = document.getElementById('dial-code-picker');
-        if (!picker) return;
+        var wrapper = document.getElementById('custom-dial-code-wrapper');
+        if (!wrapper) return;
 
+        var trigger = document.getElementById('custom-dial-code-trigger');
+        var textSpan = document.getElementById('custom-dial-code-text');
+        var dropdown = document.getElementById('custom-dial-code-dropdown');
+        var searchInput = document.getElementById('custom-dial-code-search');
         var select = document.getElementById('phone_country_code');
-        var btn = document.getElementById('dial-code-btn');
-        var label = document.getElementById('dial-code-label');
-        var dropdown = document.getElementById('dial-code-dropdown');
-        var searchInput = document.getElementById('dial-code-search-input');
-        var options = dropdown.querySelectorAll('.dial-code-opt');
-        var emptyMsg = document.getElementById('dial-code-empty');
+        var list = document.getElementById('custom-dial-code-list');
+        var options = list ? list.querySelectorAll('.custom-dial-opt') : [];
+        var emptyMsg = document.getElementById('custom-dial-code-empty');
 
-        function syncLabel() {
-            if (!select || !label) return;
-            var selectedOpt = select.options[select.selectedIndex];
-            if (selectedOpt && selectedOpt.value) {
-                label.textContent = selectedOpt.textContent.trim();
-                label.classList.remove('text-secondary');
-            } else {
-                label.textContent = 'Dial code';
-                label.classList.add('text-secondary');
-            }
+        function openDropdown() {
+            dropdown.style.display = 'block';
+            trigger.setAttribute('aria-expanded', 'true');
+            trigger.classList.add('open-focus');
+            searchInput.value = '';
+            filterList('');
+            setTimeout(function () {
+                searchInput.focus();
+            }, 60);
         }
 
-        select.addEventListener('change', syncLabel);
+        function closeDropdown() {
+            dropdown.style.display = 'none';
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.classList.remove('open-focus');
+        }
 
-        btn.addEventListener('click', function (e) {
+        trigger.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            var isOpen = dropdown.style.display === 'block';
-            if (isOpen) {
+            if (dropdown.style.display === 'block') {
                 closeDropdown();
             } else {
                 openDropdown();
             }
         });
 
-        function openDropdown() {
-            dropdown.style.display = 'block';
-            btn.setAttribute('aria-expanded', 'true');
-            searchInput.value = '';
-            filterOptions('');
-            setTimeout(function () {
-                searchInput.focus();
-            }, 50);
-        }
-
-        function closeDropdown() {
-            dropdown.style.display = 'none';
-            btn.setAttribute('aria-expanded', 'false');
-        }
-
-        function filterOptions(query) {
-            query = query.toLowerCase().trim();
-            var visibleCount = 0;
+        function filterList(q) {
+            q = q.toLowerCase().trim();
+            var visible = 0;
             options.forEach(function (opt) {
-                var searchData = opt.getAttribute('data-search') || '';
-                if (!query || searchData.indexOf(query) !== -1) {
+                var search = opt.getAttribute('data-search') || '';
+                if (!q || search.indexOf(q) !== -1) {
                     opt.style.display = '';
-                    visibleCount++;
+                    visible++;
                 } else {
                     opt.style.display = 'none';
                 }
             });
-
             if (emptyMsg) {
-                emptyMsg.classList.toggle('d-none', visibleCount > 0);
+                emptyMsg.classList.toggle('d-none', visible > 0);
             }
         }
 
         searchInput.addEventListener('input', function () {
-            filterOptions(this.value);
+            filterList(this.value);
         });
 
         searchInput.addEventListener('keydown', function (e) {
@@ -482,34 +501,71 @@
                 e.preventDefault();
                 for (var i = 0; i < options.length; i++) {
                     if (options[i].style.display !== 'none' && options[i].getAttribute('data-value')) {
-                        selectOption(options[i]);
+                        selectItem(options[i]);
                         break;
                     }
                 }
             } else if (e.key === 'Escape') {
                 closeDropdown();
-                btn.focus();
+                trigger.focus();
             }
         });
 
-        function selectOption(opt) {
+        function selectItem(opt) {
             var val = opt.getAttribute('data-value');
+            var label = opt.getAttribute('data-label') || 'Dial code';
             select.value = val;
             select.dispatchEvent(new Event('change', { bubbles: true }));
-            syncLabel();
+
+            textSpan.textContent = label;
+            if (val) {
+                textSpan.classList.remove('text-secondary');
+            } else {
+                textSpan.classList.add('text-secondary');
+            }
+
+            options.forEach(function (o) {
+                o.classList.toggle('active-opt', o.getAttribute('data-value') === val);
+            });
+
             closeDropdown();
-            btn.focus();
+            trigger.focus();
         }
 
         options.forEach(function (opt) {
             opt.addEventListener('click', function (e) {
                 e.stopPropagation();
-                selectOption(this);
+                selectItem(this);
             });
         });
 
+        // Sync when select.value is changed externally (e.g. visiting-card.js or form reset)
+        select.addEventListener('change', function () {
+            var val = this.value;
+            var matched = null;
+            options.forEach(function (o) {
+                if (o.getAttribute('data-value') === val) {
+                    matched = o;
+                }
+            });
+            if (matched) {
+                var label = matched.getAttribute('data-label');
+                textSpan.textContent = label;
+                textSpan.classList.remove('text-secondary');
+                options.forEach(function (o) {
+                    o.classList.toggle('active-opt', o === matched);
+                });
+            } else if (!val) {
+                textSpan.textContent = 'Dial code';
+                textSpan.classList.add('text-secondary');
+                options.forEach(function (o) {
+                    o.classList.remove('active-opt');
+                });
+            }
+        });
+
         document.addEventListener('click', function (e) {
-            if (!picker.contains(e.target)) {
+            if (!wrapper.contains(e.target)) {
                 closeDropdown();
             }
         });
@@ -517,6 +573,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && dropdown.style.display === 'block') {
                 closeDropdown();
+                trigger.focus();
             }
         });
     })();
