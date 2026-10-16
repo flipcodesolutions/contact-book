@@ -6,7 +6,7 @@
     @php
         $extraFilterCount = 0;
 
-        foreach (['department_id', 'country_id', 'city', 'lead_status_id'] as $filterName) {
+        foreach (['department_id', 'country_id', 'city', 'lead_source_id'] as $filterName) {
             if (request()->filled($filterName)) {
                 $extraFilterCount++;
             }
@@ -81,12 +81,13 @@
                                     <input class="form-control" id="city" name="city" value="{{ request('city') }}">
                                 </div>
                                 <div class="col-12 col-lg-3">
-                                    <label class="form-label" for="lead_status_id">Status</label>
-                                    <select class="form-select" id="lead_status_id" name="lead_status_id">
+                                    <label class="form-label" for="lead_source_id">Source</label>
+                                    <select class="form-select" id="lead_source_id" name="lead_source_id">
                                         <option value="">All</option>
-                                        @foreach ($statuses as $status)
-                                            <option value="{{ $status->id }}" @if ((string) request('lead_status_id') === (string) $status->id) selected @endif>{{ $status->name }}</option>
+                                        @foreach ($sources as $source)
+                                            <option value="{{ $source->id }}" @if ((string) request('lead_source_id') === (string) $source->id) selected @endif>{{ $source->name }}</option>
                                         @endforeach
+                                        <option value="none" @if (request('lead_source_id') === 'none') selected @endif>No source</option>
                                     </select>
                                 </div>
                             </div>

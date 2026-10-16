@@ -31,15 +31,26 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Save a new department.
+     * Save a new department. If a soft-deleted department with the same name exists, restore it.
      */
     public function store(DepartmentRequest $request)
     {
         abort_unless($request->user()->canManageDepartments(), 403);
 
+        $name = $request->input('name');
+        $existing = Department::withTrashed()->where('name', $name)->first();
+
+        if ($existing) {
+            $existing->restore();
+            $existing->is_active = $request->boolean('is_active', true);
+            $existing->save();
+
+            return redirect()->route('departments.index')->with('success', 'Department created.');
+        }
+
         $department = new Department;
-        $department->name = $request->input('name');
-        $department->is_active = $request->boolean('is_active');
+        $department->name = $name;
+        $department->is_active = $request->boolean('is_active', true);
         $department->save();
 
         return redirect()->route('departments.index')->with('success', 'Department created.');
@@ -81,5 +92,17 @@ class DepartmentController extends Controller
         $department->save();
 
         return back()->with('success', 'Department updated.');
+    }
+
+    /**
+     * Soft-delete a department.
+     */
+    public function destroy(Request $request, Department $department)
+    {
+        abort_unless($request->user()->canManageDepartments(), 403);
+
+        $department->delete();
+
+        return redirect()->route('departments.index')->with('success', 'Department deleted.');
     }
 }

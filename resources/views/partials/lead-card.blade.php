@@ -59,8 +59,7 @@
         </div>
 
         <div class="d-flex align-items-center mt-auto">
-            <span class="status-dot me-2" style="background: {{ $lead->status ? $lead->status->color : '#EFE7DF' }}"></span>
-            <span class="small">{{ $lead->status ? $lead->status->name : 'No status' }}</span>
+            <span class="small text-secondary"><strong>Source:-</strong> {{ $lead->source ? $lead->source->name : 'No source' }}</span>
             <span class="ms-auto">
                 @if (auth()->user()->canCreateLeads())
                     <a class="icon-btn" href="{{ route('leads.edit', $lead) }}" aria-label="Edit {{ $lead->full_name }}">

@@ -79,7 +79,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <h2 class="h5">Departments</h2>
-            <p class="text-secondary">A department right includes that department in every country. Tick All departments to include every department, including ones added later.</p>
+            <p class="text-secondary">Choose the departments this user can access. Tick All departments to include every department, including ones added later.</p>
             <div class="form-check mb-2">
                 <input type="hidden" name="all_departments" value="0">
                 <input class="form-check-input" type="checkbox" id="all_departments" name="all_departments" value="1" @if ((string) old('all_departments', $user->all_departments ? 1 : 0) === '1') checked @endif>
@@ -100,7 +100,7 @@
     <div class="card mb-3">
         <div class="card-body">
             <h2 class="h5">Countries</h2>
-            <p class="text-secondary">A country right includes every department in that country. Tick All countries to include every country. Choose at least one side unless the role is Super Admin.</p>
+            <p class="text-secondary">Choose the countries this user can access. Tick All countries to include every country. Super Admin and Admin have full access to all data.</p>
             <div class="form-check mb-2">
                 <input type="hidden" name="all_countries" value="0">
                 <input class="form-check-input" type="checkbox" id="all_countries" name="all_countries" value="1" @if ((string) old('all_countries', $user->all_countries ? 1 : 0) === '1') checked @endif>

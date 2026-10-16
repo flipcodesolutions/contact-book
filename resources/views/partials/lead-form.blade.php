@@ -76,17 +76,48 @@
                 <div class="row g-2">
                     <div class="col-12 col-sm-5">
                         <label class="visually-hidden" for="phone_country_code">Dial code</label>
-                        <select class="form-select @error('phone_country_code') is-invalid @enderror" id="phone_country_code" name="phone_country_code" required>
-                            <option value="">Dial code</option>
-                            @php $dialCodeSelected = false; @endphp
-                            @foreach ($dialCodes as $dialCode)
-                                <option value="{{ $dialCode->dial_code }}" @if (! $dialCodeSelected && old('phone_country_code', $lead->phone_country_code) === $dialCode->dial_code) selected @php $dialCodeSelected = true; @endphp @endif>
-                                    {{ $dialCode->dial_code }} {{ $dialCode->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="position-relative" id="dial-code-picker">
+                            <select class="form-select @error('phone_country_code') is-invalid @enderror" id="phone_country_code" name="phone_country_code" required style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; top: 0; left: 0; z-index: -1;">
+                                <option value="">Dial code</option>
+                                @php $dialCodeSelected = false; @endphp
+                                @foreach ($dialCodes as $dialCode)
+                                    <option value="{{ $dialCode->dial_code }}" @if (! $dialCodeSelected && old('phone_country_code', $lead->phone_country_code) === $dialCode->dial_code) selected @php $dialCodeSelected = true; @endphp @endif>
+                                        {{ $dialCode->dial_code }} {{ $dialCode->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <button type="button" class="form-select text-start @error('phone_country_code') is-invalid @enderror" id="dial-code-btn" aria-haspopup="true" aria-expanded="false" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                <span id="dial-code-label" class="{{ old('phone_country_code', $lead->phone_country_code) ? '' : 'text-secondary' }}">
+                                    @php
+                                        $currentCode = old('phone_country_code', $lead->phone_country_code);
+                                        $matchingCountry = $dialCodes->firstWhere('dial_code', $currentCode);
+                                    @endphp
+                                    {{ $matchingCountry ? $matchingCountry->dial_code . ' ' . $matchingCountry->name : ($currentCode ?: 'Dial code') }}
+                                </span>
+                            </button>
+
+                            <div class="dropdown-menu p-2 shadow border w-100" id="dial-code-dropdown" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1050; min-width: 270px; border-radius: 8px;">
+                                <div class="mb-2">
+                                    <input type="text" class="form-control form-control-sm" id="dial-code-search-input" placeholder="Search country or code..." autocomplete="off">
+                                </div>
+                                <div class="dial-code-options-list" style="max-height: 220px; overflow-y: auto;">
+                                    <div class="dropdown-item py-1 px-2 rounded dial-code-opt text-secondary" data-value="" data-label="Dial code" data-search="dial code" style="cursor: pointer;">
+                                        <em>Dial code</em>
+                                    </div>
+                                    @foreach ($dialCodes as $dialCode)
+                                        <div class="dropdown-item py-1 px-2 rounded dial-code-opt" data-value="{{ $dialCode->dial_code }}" data-label="{{ $dialCode->dial_code }} {{ $dialCode->name }}" data-search="{{ strtolower($dialCode->dial_code . ' ' . $dialCode->name) }}" style="cursor: pointer; font-size: 0.875rem;">
+                                            <strong style="color: var(--argil-brown, #6b5442);">{{ $dialCode->dial_code }}</strong> {{ $dialCode->name }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div id="dial-code-empty" class="text-secondary text-center py-2 small d-none">
+                                    No matching dial code
+                                </div>
+                            </div>
+                        </div>
                         @error('phone_country_code')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-12 col-sm-7">
@@ -325,25 +356,6 @@
         </div>
     </div>
 
-    @if ($lead->exists)
-        <div class="card mb-3">
-            <div class="card-body">
-                <label class="form-label" for="lead_status_id">Status</label>
-                <select class="form-select @error('lead_status_id') is-invalid @enderror" id="lead_status_id" name="lead_status_id">
-                    <option value="">No status</option>
-                    @foreach ($statuses as $status)
-                        <option value="{{ $status->id }}" @if ((string) old('lead_status_id', $lead->lead_status_id) === (string) $status->id) selected @endif>
-                            {{ $status->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('lead_status_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-        </div>
-    @endif
-
     <div class="d-flex gap-2">
         <a class="btn btn-outline-secondary flex-fill" href="{{ route('leads.index') }}">Cancel</a>
         <button type="submit" class="btn btn-primary flex-fill">Save</button>
@@ -389,5 +401,124 @@
             cb.addEventListener('change', syncSelectAllState);
         });
     }
+
+    // Searchable Dial Code Dropdown
+    (function () {
+        var picker = document.getElementById('dial-code-picker');
+        if (!picker) return;
+
+        var select = document.getElementById('phone_country_code');
+        var btn = document.getElementById('dial-code-btn');
+        var label = document.getElementById('dial-code-label');
+        var dropdown = document.getElementById('dial-code-dropdown');
+        var searchInput = document.getElementById('dial-code-search-input');
+        var options = dropdown.querySelectorAll('.dial-code-opt');
+        var emptyMsg = document.getElementById('dial-code-empty');
+
+        function syncLabel() {
+            if (!select || !label) return;
+            var selectedOpt = select.options[select.selectedIndex];
+            if (selectedOpt && selectedOpt.value) {
+                label.textContent = selectedOpt.textContent.trim();
+                label.classList.remove('text-secondary');
+            } else {
+                label.textContent = 'Dial code';
+                label.classList.add('text-secondary');
+            }
+        }
+
+        select.addEventListener('change', syncLabel);
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var isOpen = dropdown.style.display === 'block';
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        });
+
+        function openDropdown() {
+            dropdown.style.display = 'block';
+            btn.setAttribute('aria-expanded', 'true');
+            searchInput.value = '';
+            filterOptions('');
+            setTimeout(function () {
+                searchInput.focus();
+            }, 50);
+        }
+
+        function closeDropdown() {
+            dropdown.style.display = 'none';
+            btn.setAttribute('aria-expanded', 'false');
+        }
+
+        function filterOptions(query) {
+            query = query.toLowerCase().trim();
+            var visibleCount = 0;
+            options.forEach(function (opt) {
+                var searchData = opt.getAttribute('data-search') || '';
+                if (!query || searchData.indexOf(query) !== -1) {
+                    opt.style.display = '';
+                    visibleCount++;
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+
+            if (emptyMsg) {
+                emptyMsg.classList.toggle('d-none', visibleCount > 0);
+            }
+        }
+
+        searchInput.addEventListener('input', function () {
+            filterOptions(this.value);
+        });
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                for (var i = 0; i < options.length; i++) {
+                    if (options[i].style.display !== 'none' && options[i].getAttribute('data-value')) {
+                        selectOption(options[i]);
+                        break;
+                    }
+                }
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+                btn.focus();
+            }
+        });
+
+        function selectOption(opt) {
+            var val = opt.getAttribute('data-value');
+            select.value = val;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            syncLabel();
+            closeDropdown();
+            btn.focus();
+        }
+
+        options.forEach(function (opt) {
+            opt.addEventListener('click', function (e) {
+                e.stopPropagation();
+                selectOption(this);
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!picker.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && dropdown.style.display === 'block') {
+                closeDropdown();
+            }
+        });
+    })();
 </script>
 <script src="{{ asset('js/visiting-card.js') }}"></script>

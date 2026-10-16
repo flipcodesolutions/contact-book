@@ -73,7 +73,7 @@ class UserRequest extends FormRequest
         $rules['all_departments'] = ['nullable', 'boolean'];
         $rules['all_countries'] = ['nullable', 'boolean'];
 
-        if ($this->input('role') !== 'super_admin') {
+        if (! in_array($this->input('role'), ['super_admin', 'admin'])) {
             $rules['department_ids'] = ['nullable', 'array'];
             $rules['department_ids.*'] = ['integer', 'exists:departments,id'];
             $rules['country_ids'] = ['nullable', 'array'];
@@ -86,15 +86,15 @@ class UserRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->input('role') === 'super_admin') {
+            if (in_array($this->input('role'), ['super_admin', 'admin'])) {
                 return;
             }
 
             $hasDepartments = $this->boolean('all_departments') || count((array) $this->input('department_ids', [])) > 0;
             $hasCountries = $this->boolean('all_countries') || count((array) $this->input('country_ids', [])) > 0;
 
-            if (! $hasDepartments && ! $hasCountries) {
-                $validator->errors()->add('department_ids', 'Choose departments, countries, or tick All on at least one side.');
+            if (! $hasDepartments || ! $hasCountries) {
+                $validator->errors()->add('department_ids', 'Choose at least one department and one country, or tick All on each side.');
             }
         });
     }

@@ -169,7 +169,7 @@ class UserController extends Controller
      */
     private function syncAccess(User $user, UserRequest $request): void
     {
-        if ($user->isSuperAdmin()) {
+        if ($user->isAdmin()) {
             $user->all_departments = true;
             $user->all_countries = true;
             $user->save();
