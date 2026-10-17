@@ -75,9 +75,15 @@ class UserRequest extends FormRequest
 
         if (! in_array($this->input('role'), ['super_admin', 'admin'])) {
             $rules['department_ids'] = ['nullable', 'array'];
-            $rules['department_ids.*'] = ['integer', 'exists:departments,id'];
+            $rules['department_ids.*'] = [
+                'integer',
+                Rule::exists('departments', 'id')->where(fn ($query) => $query->where('is_active', true)),
+            ];
             $rules['country_ids'] = ['nullable', 'array'];
-            $rules['country_ids.*'] = ['integer', 'exists:countries,id'];
+            $rules['country_ids.*'] = [
+                'integer',
+                Rule::exists('countries', 'id')->where(fn ($query) => $query->where('is_active', true)),
+            ];
         }
 
         return $rules;

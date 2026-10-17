@@ -37,7 +37,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete" aria-label="Delete {{ $department->name }}">
-                                        Delete
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
                                     </button>
                                 </form>
                             </td>

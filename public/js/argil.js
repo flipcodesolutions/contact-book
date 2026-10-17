@@ -171,3 +171,88 @@ document.addEventListener('click', function (event) {
 
     window.togglePasswordVisibility(button);
 });
+
+// Select-all synchronization for departments and countries on user forms
+(function () {
+    function updateChipClass(input) {
+        var chip = input.closest ? input.closest('.dept-chip') : input.parentElement;
+        if (chip && chip.classList) {
+            if (input.checked) {
+                chip.classList.add('is-checked');
+            } else {
+                chip.classList.remove('is-checked');
+            }
+        }
+    }
+
+    function initSelectAll(masterId, childSelector) {
+        var master = document.getElementById(masterId);
+        if (!master || master.dataset.syncBound === '1') return;
+        master.dataset.syncBound = '1';
+
+        var isSyncing = false;
+
+        function getChildren() {
+            return Array.from(document.querySelectorAll(childSelector));
+        }
+
+        function syncMaster() {
+            var children = getChildren();
+            if (children.length === 0) return;
+            var allChecked = children.every(function (cb) { return cb.checked; });
+            if (master.checked !== allChecked) {
+                isSyncing = true;
+                master.checked = allChecked;
+                isSyncing = false;
+            }
+        }
+
+        function setAllChildren(checked) {
+            var children = getChildren();
+            isSyncing = true;
+            children.forEach(function (cb) {
+                cb.checked = checked;
+                updateChipClass(cb);
+            });
+            isSyncing = false;
+        }
+
+        master.addEventListener('change', function () {
+            if (isSyncing) return;
+            setAllChildren(master.checked);
+        });
+
+        document.addEventListener('change', function (e) {
+            if (isSyncing) return;
+            if (!e.target || !e.target.matches(childSelector)) return;
+            updateChipClass(e.target);
+            syncMaster();
+        });
+
+        // Initial setup on page load
+        var children = getChildren();
+        if (children.length > 0) {
+            if (master.checked) {
+                setAllChildren(true);
+            } else {
+                var allChecked = children.every(function (cb) { return cb.checked; });
+                if (allChecked) {
+                    master.checked = true;
+                }
+            }
+            children.forEach(updateChipClass);
+        }
+    }
+
+    function runInit() {
+        initSelectAll('all_departments', 'input[name="department_ids[]"]');
+        initSelectAll('all_countries', 'input[name="country_ids[]"]');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runInit);
+    } else {
+        runInit();
+    }
+})();
+

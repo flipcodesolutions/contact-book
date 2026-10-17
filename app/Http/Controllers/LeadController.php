@@ -27,7 +27,7 @@ class LeadController extends Controller
             ->filtered($request)
             ->with('country', 'departments', 'status', 'source')
             ->orderBy('id', 'desc')
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
 
         $countries = $this->countriesFor($user);

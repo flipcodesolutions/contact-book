@@ -30,8 +30,8 @@
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
             <div class="form-text">
-                Columns: full_name, phone_country_code, phone_number, email, company_name, address, city, country_iso2, departments, status.
-                Separate departments with commas. country_iso2 is the two-letter code, such as GB.
+                Columns: full_name, phone_country_code, phone_number, email, company_name, address, city, country_iso2, departments, status.<br>
+                Country can be specified as a two-letter code (e.g. GB, IN) or country name (e.g. United Kingdom, India). Separate multiple departments with commas. Existing leads with matching email will be updated.
             </div>
             <button type="submit" class="btn btn-primary mt-3">Import</button>
             <a class="btn btn-outline-secondary mt-3" href="{{ route('leads.index') }}">Cancel</a>

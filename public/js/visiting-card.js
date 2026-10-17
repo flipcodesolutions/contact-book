@@ -227,6 +227,10 @@ function fillCardFields(fields) {
 
         field.value = value;
         field.classList.add('card-filled');
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+        if (window.$ && window.$(field).data('select2')) {
+            window.$(field).trigger('change');
+        }
     }
 }
 
