@@ -86,8 +86,9 @@
                 <label class="form-check-label" for="all_departments">All departments</label>
             </div>
             @foreach ($departments as $department)
-                <label class="dept-chip">
-                    <input type="checkbox" name="department_ids[]" value="{{ $department->id }}" @if (in_array($department->id, $selectedDepartmentIds)) checked @endif>
+                @php $isDeptSelected = in_array($department->id, $selectedDepartmentIds); @endphp
+                <label class="dept-chip {{ $isDeptSelected ? 'is-checked' : '' }}">
+                    <input type="checkbox" name="department_ids[]" value="{{ $department->id }}" @if ($isDeptSelected) checked @endif>
                     <span>{{ $department->name }}</span>
                 </label>
             @endforeach
@@ -107,8 +108,9 @@
                 <label class="form-check-label" for="all_countries">All countries</label>
             </div>
             @foreach ($countries as $country)
-                <label class="dept-chip">
-                    <input type="checkbox" name="country_ids[]" value="{{ $country->id }}" @if (in_array($country->id, $selectedCountryIds)) checked @endif>
+                @php $isCountrySelected = in_array($country->id, $selectedCountryIds); @endphp
+                <label class="dept-chip {{ $isCountrySelected ? 'is-checked' : '' }}">
+                    <input type="checkbox" name="country_ids[]" value="{{ $country->id }}" @if ($isCountrySelected) checked @endif>
                     <span>{{ $country->name }}</span>
                 </label>
             @endforeach
@@ -121,3 +123,88 @@
     <button type="submit" class="btn btn-primary">{{ $user->exists ? 'Update user' : 'Create user' }}</button>
     <a class="btn btn-outline-secondary" href="{{ route('users.index') }}">Cancel</a>
 </form>
+
+<script>
+    (function () {
+        function updateChipClass(input) {
+            var chip = input.closest ? input.closest('.dept-chip') : input.parentElement;
+            if (chip && chip.classList) {
+                if (input.checked) {
+                    chip.classList.add('is-checked');
+                } else {
+                    chip.classList.remove('is-checked');
+                }
+            }
+        }
+
+        function initSelectAll(masterId, childSelector) {
+            var master = document.getElementById(masterId);
+            if (!master || master.dataset.syncBound === '1') return;
+            master.dataset.syncBound = '1';
+
+            var isSyncing = false;
+
+            function getChildren() {
+                return Array.from(document.querySelectorAll(childSelector));
+            }
+
+            function syncMaster() {
+                var children = getChildren();
+                if (children.length === 0) return;
+                var allChecked = children.every(function (cb) { return cb.checked; });
+                if (master.checked !== allChecked) {
+                    isSyncing = true;
+                    master.checked = allChecked;
+                    isSyncing = false;
+                }
+            }
+
+            function setAllChildren(checked) {
+                var children = getChildren();
+                isSyncing = true;
+                children.forEach(function (cb) {
+                    cb.checked = checked;
+                    updateChipClass(cb);
+                });
+                isSyncing = false;
+            }
+
+            master.addEventListener('change', function () {
+                if (isSyncing) return;
+                setAllChildren(master.checked);
+            });
+
+            document.addEventListener('change', function (e) {
+                if (isSyncing) return;
+                if (!e.target || !e.target.matches(childSelector)) return;
+                updateChipClass(e.target);
+                syncMaster();
+            });
+
+            // Initial setup on page load
+            var children = getChildren();
+            if (children.length > 0) {
+                if (master.checked) {
+                    setAllChildren(true);
+                } else {
+                    var allChecked = children.every(function (cb) { return cb.checked; });
+                    if (allChecked) {
+                        master.checked = true;
+                    }
+                }
+                children.forEach(updateChipClass);
+            }
+        }
+
+        function runInit() {
+            initSelectAll('all_departments', 'input[name="department_ids[]"]');
+            initSelectAll('all_countries', 'input[name="country_ids[]"]');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runInit);
+        } else {
+            runInit();
+        }
+    })();
+</script>

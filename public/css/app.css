@@ -307,7 +307,8 @@ input:-webkit-autofill:active {
     height: 1px;
 }
 
-.dept-chip:has(input:checked) {
+.dept-chip:has(input:checked),
+.dept-chip.is-checked {
     background: var(--argil-ink);
     color: #fff;
 }

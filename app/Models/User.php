@@ -170,7 +170,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $allowedIds = $this->departments()->pluck('departments.id')->all();
+        $allowedIds = $this->departments()->where('departments.is_active', true)->pluck('departments.id')->all();
 
         foreach ($departmentIds as $departmentId) {
             $found = false;
@@ -199,7 +199,7 @@ class User extends Authenticatable
             return true;
         }
 
-        $allowedIds = $this->countries()->pluck('countries.id')->all();
+        $allowedIds = $this->countries()->where('countries.is_active', true)->pluck('countries.id')->all();
 
         foreach ($allowedIds as $allowedId) {
             if ((int) $allowedId === (int) $countryId) {

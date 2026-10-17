@@ -18,7 +18,10 @@ class UserController extends Controller
         abort_unless($request->user()->canViewUsers(), 403);
 
         $users = User::query()
-            ->with('departments', 'countries')
+            ->with([
+                'departments' => fn ($query) => $query->where('departments.is_active', true),
+                'countries' => fn ($query) => $query->where('countries.is_active', true),
+            ])
             ->orderBy('name')
             ->paginate(10);
 
@@ -206,16 +209,16 @@ class UserController extends Controller
             }
         }
 
-        $departments = Department::query()->orderBy('name')->get();
-        $countries = Country::query()->orderBy('name')->get();
+        $departments = Department::query()->where('is_active', true)->orderBy('name')->get();
+        $countries = Country::query()->where('is_active', true)->orderBy('name')->get();
 
         $selectedDepartmentIds = $this->selectedIds(
             'department_ids',
-            $user->exists ? $user->departments->pluck('id')->all() : []
+            $user->exists ? ($user->all_departments ? $departments->pluck('id')->all() : $user->departments()->where('departments.is_active', true)->pluck('departments.id')->all()) : []
         );
         $selectedCountryIds = $this->selectedIds(
             'country_ids',
-            $user->exists ? $user->countries->pluck('id')->all() : []
+            $user->exists ? ($user->all_countries ? $countries->pluck('id')->all() : $user->countries()->where('countries.is_active', true)->pluck('countries.id')->all()) : []
         );
 
         return compact(
